@@ -28,10 +28,61 @@ function PlaidButton() {
   return <div><button className="secondary" onClick={connect}>Connect an Existing Account</button>{status && <p className="status">{status}</p>}</div>;
 }
 
+function ApplicationDisclaimer({ partner, close }) {
+  const [accepted, setAccepted] = useState(false);
+  return <div className="overlay application-overlay" onMouseDown={e=>e.target===e.currentTarget&&close()}>
+    <section className="modal disclaimer-modal" role="dialog" aria-modal="true" aria-labelledby="application-disclaimer-title">
+      <header>
+        <button className="close" onClick={close} aria-label="Close">×</button>
+        <span>COUNTYCOUNT DISCLOSURE</span>
+        <h2 id="application-disclaimer-title">Before You Apply</h2>
+        <p>Please review and acknowledge this information before continuing.</p>
+      </header>
+      <div className="modal-body disclaimer-copy">
+        <h3>You are leaving CountyCount</h3>
+        <p>The issuing financial institution may not be located in your home county. Major taxable purchases made in your home county can still help support local services and causes.</p>
+        <p>Points, rewards, eligibility, rates, fees, and approval are determined by the issuing financial institution and are not guaranteed by CountyCount.</p>
+        <p>Plaid may be used only to securely connect eligible accounts with your permission. Plaid does not issue cards or provide points or rewards. Tax allocation and local benefits vary by purchase and location.</p>
+        <p>CountyCount is an independent initiative and is not a bank, credit union, lender, government agency, or financial advisor.</p>
+        <label className="acknowledge">
+          <input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} />
+          <span>I have read and understand this disclosure.</span>
+        </label>
+        <div className="disclaimer-actions">
+          <button className="secondary" onClick={close}>Cancel</button>
+          <a
+            className={`button ${accepted?'':'disabled'}`}
+            href={accepted ? partner.applicationUrl : undefined}
+            target="_blank"
+            rel="noreferrer"
+            aria-disabled={!accepted}
+            onClick={e=>{if(!accepted)e.preventDefault();}}
+          >
+            Continue to {partner.name}
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>;
+}
+
 function PartnerModal({ close }) {
   const [partners,setPartners]=useState(null);
+  const [selectedPartner,setSelectedPartner]=useState(null);
   useEffect(()=>{fetch('/api/financial-partners').then(r=>r.json()).then(setPartners).catch(()=>setPartners([]));},[]);
-  return <div className="overlay" onMouseDown={e=>e.target===e.currentTarget&&close()}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="partner-title"><header><button className="close" onClick={close} aria-label="Close">×</button><span>COUNTYCOUNT PARTNERS</span><h2 id="partner-title">Choose a Financial Partner</h2><p>Review verified terms directly with each independent financial institution.</p></header><div className="modal-body">{partners===null?<p>Loading partner institutions…</p>:partners.length===0?<p>No partner institutions are available right now.</p>:partners.map(p=><article className="partner" key={p.id}><div className="bank-icon">{p.logoEmoji}</div><div><h3>{p.name}</h3><p>{p.description}</p><small>Annual fee: {p.annualFee} · Minimum deposit: {p.minDeposit}</small></div><a className="button" href={p.applicationUrl} target="_blank" rel="noreferrer">View options</a></article>)}<div className="plaid"><h3>Already have an account?</h3><p>Securely authorize CountyCount to read eligible transaction information through Plaid.</p><PlaidButton /></div></div><footer>CountyCount is not a bank or credit union. Accounts and cards are offered by independent financial institutions and are subject to their terms and approval.</footer></section></div>;
+  return <>
+    <div className="overlay" onMouseDown={e=>e.target===e.currentTarget&&close()}>
+      <section className="modal" role="dialog" aria-modal="true" aria-labelledby="partner-title">
+        <header><button className="close" onClick={close} aria-label="Close">×</button><span>COUNTYCOUNT PARTNERS</span><h2 id="partner-title">Choose a Financial Partner</h2><p>Review verified terms directly with each independent financial institution.</p></header>
+        <div className="modal-body">
+          {partners===null?<p>Loading partner institutions…</p>:partners.length===0?<p>No partner institutions are available right now.</p>:partners.map(p=><article className="partner" key={p.id}><div className="bank-icon">{p.logoEmoji}</div><div><h3>{p.name}</h3><p>{p.description}</p><small>Annual fee: {p.annualFee} · Minimum deposit: {p.minDeposit}</small></div><button className="button" onClick={()=>setSelectedPartner(p)}>Apply / View Options</button></article>)}
+          <div className="plaid"><strong>Already have an account?</strong><p>Securely connect an eligible account through Plaid. Plaid does not issue cards or provide rewards.</p><PlaidButton /></div>
+          <p className="fine-print">CountyCount is not a bank, credit union, lender, or financial adviser. Applications, approvals, rates, fees, rewards, and account servicing are handled by the selected financial institution.</p>
+        </div>
+      </section>
+    </div>
+    {selectedPartner&&<ApplicationDisclaimer partner={selectedPartner} close={()=>setSelectedPartner(null)} />}
+  </>;
 }
 
 export default function App(){
