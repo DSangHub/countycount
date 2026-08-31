@@ -19,3 +19,5 @@ NODE_ENV=production npm start
 Copy `.env.example` to `.env` and supply Plaid Sandbox credentials through the hosting provider's secret manager. Never commit secrets.
 
 The partner modal is fed by `GET /api/financial-partners`. Plaid Link uses server-side routes under `/api/plaid`. The public-token exchange intentionally does not persist Plaid access tokens until authenticated user storage and encryption are configured; this prevents unsafe handling of bank credentials.
+
+Vercel Functions provide the production API routes in `api/`. `vercel.json` permanently redirects legacy `/county-count` links to the root URL.
