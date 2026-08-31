@@ -5,7 +5,7 @@ const services = [
   ['🚔','Police Protection','Local law enforcement and emergency response.'],['🚒','Fire Department','Stations, equipment, and rapid emergency response.'],['🛣️','Roads','Repair, resurfacing, bridges, and local transit.'],['💡','Street Lighting','Safer streets, signals, and neighborhood lighting.'],['📚','Schools & Libraries','Education, after-school programs, and libraries.'],['🐾','Animal Shelters','Animal control, rescue, adoption, and pet welfare.']
 ];
 
-function PlaidButton() {
+function PlaidButton({ label = 'Connect an Existing Account' }) {
   const [token, setToken] = useState(null);
   const [status, setStatus] = useState('');
   const { open, ready } = usePlaidLink({
@@ -25,7 +25,7 @@ function PlaidButton() {
     setToken(result.link_token);
   }
   useEffect(()=>{ if(token && ready) open(); },[token,ready,open]);
-  return <div><button className="secondary" onClick={connect}>Connect an Existing Account</button>{status && <p className="status">{status}</p>}</div>;
+  return <div><button className="secondary" onClick={connect}>{label}</button>{status && <p className="status">{status}</p>}</div>;
 }
 
 function ApplicationDisclaimer({ partner, close }) {
@@ -35,18 +35,19 @@ function ApplicationDisclaimer({ partner, close }) {
       <header>
         <button className="close" onClick={close} aria-label="Close">×</button>
         <span>COUNTYCOUNT DISCLOSURE</span>
-        <h2 id="application-disclaimer-title">Before You Apply</h2>
+        <h2 id="application-disclaimer-title">Before You Explore Financial Options</h2>
         <p>Please review and acknowledge this information before continuing.</p>
       </header>
       <div className="modal-body disclaimer-copy">
         <h3>You are leaving CountyCount</h3>
-        <p>The issuing financial institution may not be located in your home county. Major taxable purchases made in your home county can still help support local services and causes.</p>
-        <p>Points, rewards, eligibility, rates, fees, and approval are determined by the issuing financial institution and are not guaranteed by CountyCount.</p>
-        <p>Plaid may be used only to securely connect eligible accounts with your permission. Plaid does not issue cards or provide points or rewards. Tax allocation and local benefits vary by purchase and location.</p>
+        <p>The financial institution may not be located in your home county. Credit cards, auto loans, home loans, personal loans, business loans, and other products may be available through the institution. Major taxable purchases made in your home county can still help support local services and causes.</p>
+        <p>Available products, points, rewards, eligibility, rates, fees, and approval are determined solely by the financial institution and are not guaranteed by CountyCount.</p>
+        <p>Connecting through Plaid is optional and does not constitute a credit-card or loan application. Plaid securely connects eligible existing accounts with your permission; it does not issue cards, make loans, determine approval, or provide points or rewards. Tax allocation and local benefits vary by purchase and location.</p>
         <p>CountyCount is an independent initiative and is not a bank, credit union, lender, government agency, or financial advisor.</p>
+        <div className="plaid disclaimer-plaid"><strong>Optional: connect an existing account</strong><p>You may securely connect an eligible account before continuing, or skip this step and go directly to the financial institution.</p><PlaidButton label="Connect with Plaid (Optional)" /></div>
         <label className="acknowledge">
           <input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} />
-          <span>I have read and understand this disclosure.</span>
+          <span>I understand this disclosure and that Plaid connection is optional.</span>
         </label>
         <div className="disclaimer-actions">
           <button className="secondary" onClick={close}>Cancel</button>
@@ -58,7 +59,7 @@ function ApplicationDisclaimer({ partner, close }) {
             aria-disabled={!accepted}
             onClick={e=>{if(!accepted)e.preventDefault();}}
           >
-            Continue to {partner.name}
+            Explore Options at {partner.name}
           </a>
         </div>
       </div>
@@ -75,8 +76,8 @@ function PartnerModal({ close }) {
       <section className="modal" role="dialog" aria-modal="true" aria-labelledby="partner-title">
         <header><button className="close" onClick={close} aria-label="Close">×</button><span>COUNTYCOUNT PARTNERS</span><h2 id="partner-title">Choose a Financial Partner</h2><p>Review verified terms directly with each independent financial institution.</p></header>
         <div className="modal-body">
-          {partners===null?<p>Loading partner institutions…</p>:partners.length===0?<p>No partner institutions are available right now.</p>:partners.map(p=><article className="partner" key={p.id}><div className="bank-icon">{p.logoEmoji}</div><div><h3>{p.name}</h3><p>{p.description}</p><small>Annual fee: {p.annualFee} · Minimum deposit: {p.minDeposit}</small></div><button className="button" onClick={()=>setSelectedPartner(p)}>Apply / View Options</button></article>)}
-          <div className="plaid"><strong>Already have an account?</strong><p>Securely connect an eligible account through Plaid. Plaid does not issue cards or provide rewards.</p><PlaidButton /></div>
+          {partners===null?<p>Loading partner institutions…</p>:partners.length===0?<p>No partner institutions are available right now.</p>:partners.map(p=><article className="partner" key={p.id}><div className="bank-icon">{p.logoEmoji}</div><div><h3>{p.name}</h3><p>{p.description}</p><small>Annual fee: {p.annualFee} · Minimum deposit: {p.minDeposit}</small></div><button className="button" onClick={()=>setSelectedPartner(p)}>Explore Cards & Loans</button></article>)}
+          <div className="plaid"><strong>Optional account connection</strong><p>Securely connect an eligible existing account through Plaid. This is not a credit or loan application.</p><PlaidButton label="Connect with Plaid (Optional)" /></div>
           <p className="fine-print">CountyCount is not a bank, credit union, lender, or financial adviser. Applications, approvals, rates, fees, rewards, and account servicing are handled by the selected financial institution.</p>
         </div>
       </section>
