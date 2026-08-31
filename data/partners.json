@@ -1,16 +1,1 @@
-[
-  {
-    "id": "noble-credit-union",
-    "name": "Noble Credit Union",
-    "type": "credit_union",
-    "logoEmoji": "🏦",
-    "description": "Explore account options directly with Noble Credit Union. Eligibility, fees, rewards, and approval are determined by the institution.",
-    "cashBackRate": "See institution terms",
-    "annualFee": "See institution terms",
-    "minDeposit": "See institution terms",
-    "countyCount": "California service area",
-    "cardTypes": ["debit"],
-    "applicationUrl": "https://www.noblecu.com/open-an-account",
-    "status": "active"
-  }
-]
+[]
